@@ -16,31 +16,30 @@ const LoginPage = () => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-
+  
     try {
       const formData = new URLSearchParams();
       formData.append('username', username);
       formData.append('password', password);
-
-      const response = await axiosInstance.post('oauth2/token', formData, {
+  
+      const response = await axiosInstance.post('auth/login', Object.fromEntries(formData.entries()), {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
       });
-
-      if (response.data && response.data.access_token) {
-        Cookies.set('authorization', `Bearer ${response.data.access_token}`, { expires: 1 });
-
-        localStorage.setItem('username , roles', JSON.stringify(`UserName: ${response.data.profile.username}, UserRoles: ${response.data.profile.roles}`));
-
+  
+      if (response.data && response.data.authorization) {
+        Cookies.set('authorization', response.data.authorization, { expires: 1 });
+  
+        localStorage.setItem('username , roles', JSON.stringify(`${response.data.profile.username}/${response.data.profile.roles}`));
+  
         setProfile(response.data.profile);
-
+  
         navigate('/home');
-
       } else {
         setError('Unexpected response from the server');
       }
-
+  
     } catch (error) {
       setError(error.message);
     }

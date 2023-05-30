@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../Components/axios/axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useUserContext } from '../../Components/UserContext/UserContext';
 import Cookies from 'js-cookie';
 import Logout from "../../Components/Logout/Logout-btn";
@@ -11,9 +11,7 @@ const UserListPage = () => {
   const [error, setError] = useState(null);
   const { authorization } = useUserContext();
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(15);
-  const navigate = useNavigate();
-
+  const [userSize, setUserSize] = useState(15);
 
   useEffect(() => {
     fetchUserList();
@@ -30,7 +28,7 @@ const UserListPage = () => {
     }
 
     try {
-      const response = await axiosInstance.get(`moodle/user/student/all?pageNum=${page}&pageSize=${pageSize}`, {
+      const response = await axiosInstance.get(`moodle/user/student/all?pageNum=${page}&pageSize=${userSize}`, {
         headers: {
           Authorization: authorization,
         },
@@ -53,11 +51,6 @@ const UserListPage = () => {
     }
   };
 
-  const handIDClick = (id) => {
-    localStorage.setItem('userId', id);
-    navigate('/home/userlist/user');
-  };
-
   const renderUserList = () => {
     if (!userList) {
       return null;
@@ -71,36 +64,23 @@ const UserListPage = () => {
               <th>ID</th>
               <th>First Name</th>
               <th>Last Name</th>
-              <th>Email</th>
-              <th>City</th>
-              <th>Phone</th>
-              <th>Mobile</th>
-              <th>Role</th>
             </tr>
           </thead>
           <tbody>
             {userList.map((user) => (
-              <tr key={user.id} onClick={() => handIDClick(user.id)} style={{cursor:("pointer")}}>
-                <td>{user.id} - </td>
-                <td>{user.firstName} - </td>
-                <td>{user.family} - </td>
-                <td>{user.email} - </td>
-                <td>{user.city} - </td>
-                <td>{user.phone} - </td>
-                <td>{user.mobile} - </td>
-                <td>
-                  {user.roles.map((roles) => (
-                    <tr key={`${user.id}-${roles.name}-${roles.userRole}`}>
-                      <td>{roles.name} / {roles.userRole} -</td>
-                    </tr>
-                  ))}
-                </td>
+              <tr key={user.id} style={{ cursor: "pointer" }}>
+                <Link to={`/home/userlist/user/${user.moodleUser.id}`} style={{ textDecoration: "none" ,  color:"black"}}>
+                  <td>{user.moodleUser.id} - </td>
+                  <td>{user.moodleUser.firstName} - </td>
+                  <td>{user.moodleUser.lastName} - </td>
+                </Link>
               </tr>
             ))}
           </tbody>
         </table>
         <div>
           <button onClick={prevPage} disabled={page === 1}>Previous</button>
+          <span> page: {page} </span>
           <button onClick={nextPage}>Next</button>
         </div>
       </>

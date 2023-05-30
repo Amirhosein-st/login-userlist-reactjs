@@ -1,68 +1,59 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../Components/axios/axios';
 import Cookies from 'js-cookie';
+import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import Logout from "../../Components/Logout/Logout-btn";
 
 const UserPage = () => {
     const [userData, setUserData] = useState({});
-    const [userImage, setUserImage] = useState({});
+    const { id } = useParams();
 
     useEffect(() => {
         const fetchData = async () => {
-            const ID = localStorage.getItem('userId');
             const authorization = Cookies.get('authorization');
-            const response = await axiosInstance.get(`moodle/user/${ID}`, {
+            const response = await axiosInstance.get(`moodle/user/${id}`, {
                 headers: {
                     Authorization: authorization,
                 },
             });
+            console.log(response.data);
             setUserData(response.data);
-            // localStorage.removeItem('userId');
         };
-
         fetchData();
-    }, []);
-
-
-    useEffect(() => {
-        const fetchImage = async () => {
-            const ID = localStorage.getItem('userId');
-            const authorization = Cookies.get('authorization');
-            const response22 = await axiosInstance.get(`moodle/user/image/${ID}`, {
-                headers: {
-                    Authorization: authorization,
-                },
-            });
-            // console.log(response22.data.imageAddress);
-            setUserImage(response22.data.imageAddress);
-        };
-        fetchImage();
-
-    }, []);
+    }, [id]);
 
     return (
-        <div>
-            <h1>User Details</h1>
-            <p>ID: {userData.id}</p>
-            <p>Username: {userData.username}</p>
-            <p>First Name: {userData.firstName}</p>
-            <p>Family: {userData.family}</p>
-            <h2>Roles:</h2>
-            <ul>
-                {userData.roles?.map((role) => (
-                    <li key={role.id}>{role.name} ({role.userRole})</li>
-                ))}
-            </ul>
-            <h2>Info Data:</h2>
-            <ul>
-                {userData?.infoData?.map((item) => (
-                    <li key={item.field.id}>
-                        {item.field.name} : {item.data}
-                    </li>
-                ))}
-            </ul>
-            <h2>Picture:</h2>
-            {/* <img src={`https://kaaryar.hossein.codes/moodle/user/image/${userImage}.png`} alt="User Profile" /> */}
-        </div>
+        <>
+            <div>
+                <h1>User List</h1>
+                <Link to="/home">
+                    <button style={{ backgroundColor: "orange", color: "green" }}>Go Home</button>
+                </Link>
+                <Link to="/home/userlist">
+                    <button style={{ backgroundColor: "green", color: "yellow" , marginLeft:"10px"}}>Go User List</button>
+                </Link>
+                <Logout />
+            </div>
+            <div>
+                <h1>User Details</h1>
+                <p>ID: {userData.id}</p>                
+                <p>Username: {userData.username}</p>
+                <p>First Name: {userData.firstName}</p>
+                <p>Last Name: {userData.lastName}</p>
+                <p>Email: {userData.email}</p>
+                <p>Mobile: {userData.mobile}</p>
+                <p>Phone: {userData.phone}</p>
+                <p>Address: {userData.address}</p>
+                <p>City: {userData.city}</p>
+                <p>Country: {userData.country}</p>
+                <p>Department: {userData.department}</p>
+                <p>Description: {userData.description}</p>
+                <p>Roles: {userData.roles && userData.roles.map(role => role.userRole).join(', ')}</p>
+                <p>Picture: {userData.picture || 'N/A'}</p>
+                <p>Timezone: {userData.timezone}</p>
+            </div>
+        </>
     );
 };
 

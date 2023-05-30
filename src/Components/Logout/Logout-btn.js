@@ -10,7 +10,7 @@ function Logout() {
         localStorage.removeItem('username , roles');
         localStorage.removeItem('profile');
 
-        navigate('/');
+        navigate('/Login');
     };
 
     return (
